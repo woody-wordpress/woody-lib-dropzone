@@ -1,0 +1,21 @@
+{
+    "name": "woody-wordpress/woody-lib-dropzone",
+    "type": "wordpress-vendor",
+    "version": "1.0.2",
+    "description": "This library adds a BDD table to store external data",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Léo POIROUX",
+            "email": "leo@raccourci.fr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Woody\\Lib\\DropZone\\": ""
+        }
+    },
+    "require": {
+        "php": "^7.3"
+    }
+}
