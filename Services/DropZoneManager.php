@@ -134,17 +134,19 @@ class DropZoneManager
     {
         global $wpdb;
 
+        $return = [];
         $results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woody_dropzone WHERE action is not NULL", ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
                 $result = $this->check_expired($result);
                 if (!empty($result['name'])) {
                     $this->warm($result['name']);
+                    $return[] = $result['name'];
                 }
             }
         }
 
-        return $result;
+        return $return;
     }
 
     private function getItem($name = null)
