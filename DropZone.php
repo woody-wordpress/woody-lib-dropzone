@@ -16,10 +16,11 @@ use Woody\Lib\DropZone\Commands\DropZoneCommand;
 final class DropZone extends Module
 {
     protected static $key = 'woody_lib_dropzone';
+    protected $refresh_list = [];
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.0.3');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.0.4');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -43,13 +44,14 @@ final class DropZone extends Module
         register_activation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'activate']);
         register_deactivation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'deactivate']);
 
+        add_action('init', [$this, 'init']);
         add_action('init', [$this, 'upgrade']);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
         add_action('woody_dropzone_set', [$this, 'set'], 10, 5);
         add_action('woody_dropzone_delete', [$this, 'delete'], 10, 1);
         add_action('woody_dropzone_warm', [$this, 'warm'], 10, 1);
-        add_action('woody_dropzone_warm_all', [$this, 'warm_all'], 10);
+        add_filter('woody_dropzone_warm_all', [$this, 'warm_all'], 10);
     }
 
     public function get($name = null)
@@ -74,9 +76,56 @@ final class DropZone extends Module
 
     public function warm_all()
     {
-        $this->dropZoneManager->warm_all();
+        return $this->dropZoneManager->warm_all();
     }
 
+    // ------------------------
+    // ADMIN BAR
+    // ------------------------
+    public function init()
+    {
+        if (is_admin()) {
+            add_action('admin_bar_menu', [$this, 'warm_all_adminbar'], 100);
+            if (isset($_GET['refresh_dropzone']) && check_admin_referer('dropzone')) {
+                $this->refresh_dropzone();
+            }
+        }
+    }
+
+    public function warm_all_adminbar($admin_bar)
+    {
+        $admin_bar->add_menu(array(
+            'id'    => 'warm-all-dropzone',
+            'title' => 'Refresh Dropzone',
+            'href'  => wp_nonce_url(add_query_arg('refresh_dropzone', 1), 'dropzone'),
+            'meta'  => array(
+                'title' => 'Refresh Dropzone',
+            )
+        ));
+    }
+
+    public function refresh_dropzone()
+    {
+        $this->refresh_list = $this->warm_all();
+        add_action('admin_notices', [$this, 'refresh_message']);
+    }
+
+    public function refresh_message()
+    {
+        if (!empty($this->refresh_list)) {
+            echo '<div id="message" class="updated fade"><p><strong>Dropzone is refreshed</strong>';
+            foreach ($this->refresh_list as $item) {
+                echo '<br />&nbsp;•&nbsp;' . $item;
+            }
+            echo '</p></div>';
+        } else {
+            echo '<div id="message" class="error fade"><p><strong>Dropzone is empty</strong></p></div>';
+        }
+    }
+
+    // ------------------------
+    // DATABASE UPGRADE
+    // ------------------------
     public function upgrade()
     {
         $saved_version = (int) get_option('woody_dropzone_db_version');
