@@ -143,11 +143,11 @@ final class DropZone extends Module
         $charset_collate = $wpdb->get_charset_collate();
         $sql[] = "CREATE TABLE `{$wpdb->base_prefix}woody_dropzone` (
             `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+            `name` varchar(255) COLLATE utf8 NOT NULL,
             `data` longtext CHARACTER SET utf8 NOT NULL,
             `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
             `expired` bigint(20) DEFAULT NULL,
-            `action` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `action` varchar(255) COLLATE utf8 DEFAULT NULL,
             `params` longtext CHARACTER SET utf8 DEFAULT NULL,
             PRIMARY KEY (`id`, `name`)
         ) $charset_collate;";
