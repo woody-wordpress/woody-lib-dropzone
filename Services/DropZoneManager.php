@@ -20,7 +20,7 @@ class DropZoneManager
 
                 // Save data inside cache if not already
                 if (!empty($result['data'])) {
-                    $data = $result['data'];
+                    $data = maybe_unserialize($result['data']);
 
                     if (defined('WP_CLI') && WP_CLI) {
                         \WP_CLI::success('DROPZONE GET (BDD) : ' . $this->isBlob($data));
