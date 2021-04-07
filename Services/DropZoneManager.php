@@ -49,7 +49,7 @@ class DropZoneManager
                 'created' => current_time('mysql'),
                 'expired' => $expired,
                 'action' => $action,
-                'params' => $params,
+                'params' => maybe_serialize($params),
             ];
 
             $results = $wpdb->get_results(sprintf("SELECT id FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);
@@ -100,23 +100,27 @@ class DropZoneManager
             $result = $this->getItem($name);
 
             if (!empty($result['action'])) {
-                if (defined('WP_CLI') && WP_CLI) {
-                    \WP_CLI::success('DROPZONE WARM : ' . $result['action']);
-                }
-
                 // Params can be pass to function as string or array
+                // dropzone_set('name', 'data', 86400, 'my_action_hook');
                 // dropzone_set('name', 'data', 0, 'my_action_hook');
                 // dropzone_set('name', 'data', 0, 'my_action_hook', 'my_var');
                 // dropzone_set('name', 'data', 0, 'my_action_hook', ['my_var', 'my_var2']);
 
                 $func_array = [];
-                $func_array[] = $result['action'];
                 if (!empty($result['params'])) {
-                    if (is_array($result['params'])) {
-                        $func_array = array_merge($func_array, $result['params']);
+                    $params = maybe_unserialize($result['params']);
+                    if (is_array($params)) {
+                        $func_array = $params;
                     } else {
-                        $func_array[] = $result['params'];
+                        $func_array[] = $params;
                     }
+                }
+
+                // Added action on first position
+                array_unshift($func_array, $result['action']);
+
+                if (defined('WP_CLI') && WP_CLI) {
+                    \WP_CLI::success('DROPZONE WARM : ' . json_encode($func_array));
                 }
 
                 // Delete before warm
@@ -165,8 +169,10 @@ class DropZoneManager
     {
         // Return empty if expired and delete item
         if (!empty($result['expired']) && !empty($result['created'])) {
+            $expired = $result['expired'];
             $created = \DateTime::createFromFormat('Y-m-d H:i:s', $result['created'], wp_timezone())->getTimestamp();
-            if (time() > $created + $expired) {
+
+            if (time() > ($created + $expired)) {
                 if (defined('WP_CLI') && WP_CLI) {
                     \WP_CLI::warning('DROPZONE EXPIRE since ' . (time() - $created + $expired) . 's');
                     $this->delete($name);
