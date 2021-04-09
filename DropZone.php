@@ -20,7 +20,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.1.1');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.1.2');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
