@@ -23,13 +23,13 @@ class DropZoneManager
                     $data = maybe_unserialize($result['data']);
 
                     if (defined('WP_CLI') && WP_CLI) {
-                        \WP_CLI::success('DROPZONE GET (BDD) : ' . $this->isBlob($data));
+                        \WP_CLI::success('DROPZONE GET "' . $name . '" (BDD) : ' . $this->isBlob($data));
                     }
 
                     wp_cache_set('dropzone_' . $name, $data, 'woody', $result['expired']);
                 }
             } elseif (defined('WP_CLI') && WP_CLI) {
-                \WP_CLI::success('DROPZONE GET (CACHE) : ' . $this->isBlob($data));
+                \WP_CLI::success('DROPZONE GET "' . $name . '" (CACHE) : ' . $this->isBlob($data));
             }
 
             return $data;
@@ -60,14 +60,14 @@ class DropZoneManager
 
                 if (defined('WP_CLI') && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    \WP_CLI::success('DROPZONE UPDATE : ' . json_encode($query));
+                    \WP_CLI::success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query));
                 }
             } else {
                 $wpdb->insert("{$wpdb->prefix}woody_dropzone", $query);
 
                 if (defined('WP_CLI') && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    \WP_CLI::success('DROPZONE INSERT : ' . json_encode($query));
+                    \WP_CLI::success('DROPZONE INSERT "' . $name . '" : ' . json_encode($query));
                 }
             }
 
@@ -86,7 +86,7 @@ class DropZoneManager
             ]);
 
             if (defined('WP_CLI') && WP_CLI) {
-                \WP_CLI::success('DROPZONE DELETE : ' . $name);
+                \WP_CLI::success('DROPZONE DELETE "' . $name . '"');
             }
 
             wp_cache_delete('dropzone_' . $name, 'woody');
@@ -120,7 +120,7 @@ class DropZoneManager
                 array_unshift($func_array, $result['action']);
 
                 if (defined('WP_CLI') && WP_CLI) {
-                    \WP_CLI::success('DROPZONE WARM : ' . json_encode($func_array));
+                    \WP_CLI::success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array));
                 }
 
                 // Delete before warm
@@ -129,7 +129,7 @@ class DropZoneManager
                 // Call do_action()
                 call_user_func_array('do_action', $func_array);
             } elseif (defined('WP_CLI') && WP_CLI) {
-                \WP_CLI::error('DROPZONE No action to WARM');
+                \WP_CLI::error('DROPZONE WARM "' . $name . '" : no action to WARM');
             }
         }
     }
@@ -174,7 +174,7 @@ class DropZoneManager
 
             if (time() > ($created + $expired)) {
                 if (defined('WP_CLI') && WP_CLI) {
-                    \WP_CLI::warning('DROPZONE EXPIRE since ' . (time() - $created + $expired) . 's');
+                    \WP_CLI::warning('DROPZONE EXPIRE "' . $name . '" since ' . (time() - $created + $expired) . 's');
                     $this->delete($name);
                 }
                 return;
