@@ -15,6 +15,7 @@ use Woody\App\Container;
 // WP_SITE_KEY=superot wp woody:dropzone delete %key%
 // WP_SITE_KEY=superot wp woody:dropzone warm %key%
 // WP_SITE_KEY=superot wp woody:dropzone warm_all
+// WP_SITE_KEY=superot wp woody:dropzone cleanup
 
 class DropZoneCommand
 {
@@ -56,5 +57,10 @@ class DropZoneCommand
     public function warm_all($args, $assoc_args)
     {
         $this->dropZoneManager->warm_all();
+    }
+
+    public function cleanup($args, $assoc_args)
+    {
+        $this->dropZoneManager->cleanup();
     }
 }
