@@ -85,10 +85,7 @@ class DropZoneManager
                 'name' => $name,
             ]);
 
-            if (defined('WP_CLI') && WP_CLI) {
-                output_success('DROPZONE DELETE "' . $name . '"');
-            }
-
+            output_success('DROPZONE DELETE "' . $name . '"');
             wp_cache_delete('dropzone_' . $name, 'woody');
         }
     }
@@ -118,17 +115,14 @@ class DropZoneManager
 
                 // Added action on first position
                 array_unshift($func_array, $result['action']);
-
-                if (defined('WP_CLI') && WP_CLI) {
-                    output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array));
-                }
+                output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array));
 
                 // Delete before warm
                 $this->delete($name);
 
                 // Call do_action()
                 call_user_func_array('do_action', $func_array);
-            } elseif (defined('WP_CLI') && WP_CLI) {
+            } else {
                 output_error('DROPZONE WARM "' . $name . '" : no action to WARM');
             }
         }
@@ -139,7 +133,7 @@ class DropZoneManager
         global $wpdb;
 
         $return = [];
-        $results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woody_dropzone WHERE action is not NULL", ARRAY_A);
+        $results = $wpdb->get_results("SELECT name, expired, created, action FROM {$wpdb->prefix}woody_dropzone WHERE action is not NULL", ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
                 $result = $this->check_expired($result);
@@ -151,6 +145,19 @@ class DropZoneManager
         }
 
         return $return;
+    }
+
+    public function cleanup()
+    {
+        global $wpdb;
+
+        $return = [];
+        $results = $wpdb->get_results("SELECT name, expired, created FROM {$wpdb->prefix}woody_dropzone", ARRAY_A);
+        if (!empty($results)) {
+            foreach ($results as $result) {
+                $this->check_expired($result);
+            }
+        }
     }
 
     private function getItem($name = null)
@@ -173,10 +180,8 @@ class DropZoneManager
             $created = \DateTime::createFromFormat('Y-m-d H:i:s', $result['created'], wp_timezone())->getTimestamp();
 
             if (time() > ($created + $expired)) {
-                if (defined('WP_CLI') && WP_CLI) {
-                    output_warning('DROPZONE EXPIRE "' . $name . '" since ' . (time() - $created + $expired) . 's');
-                    $this->delete($name);
-                }
+                output_warning('DROPZONE EXPIRE "' . $result['name'] . '" since ' . (time() - $created + $expired) . 's');
+                $this->delete($result['name']);
                 return;
             }
         }

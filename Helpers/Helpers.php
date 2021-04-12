@@ -20,13 +20,3 @@ function dropzone_delete($name = null)
 {
     do_action('woody_dropzone_delete', $name);
 }
-
-function dropzone_warm($name = null)
-{
-    do_action('woody_dropzone_warm', $name);
-}
-
-function dropzone_warm_all()
-{
-    return apply_filters('woody_dropzone_warm_all', $name);
-}

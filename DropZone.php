@@ -20,7 +20,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.1.2');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.2.0');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -47,12 +47,30 @@ final class DropZone extends Module
         add_action('init', [$this, 'init']);
         add_action('init', [$this, 'upgrade']);
 
+        add_action('init', [$this, 'scheduleDropzoneCleanup']);
+
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
         add_action('woody_dropzone_set', [$this, 'set'], 10, 5);
         add_action('woody_dropzone_delete', [$this, 'delete'], 10, 1);
         add_action('woody_dropzone_warm', [$this, 'warm'], 10, 1);
         add_filter('woody_dropzone_warm_all', [$this, 'warm_all'], 10);
+        add_action('woody_dropzone_cleanup', [$this, 'cleanup'], 10);
     }
+
+    // ------------------------
+    // CRON
+    // ------------------------
+
+    public function scheduleDropzoneCleanup()
+    {
+        if (!wp_next_scheduled('woody_dropzone_cleanup')) {
+            wp_schedule_event(time(), 'daily', 'woody_dropzone_cleanup');
+        }
+    }
+
+    // ------------------------
+    // GETTER / SETTER
+    // ------------------------
 
     public function get($name = null)
     {
@@ -77,6 +95,11 @@ final class DropZone extends Module
     public function warm_all()
     {
         return $this->dropZoneManager->warm_all();
+    }
+
+    public function cleanup()
+    {
+        $this->dropZoneManager->cleanup();
     }
 
     // ------------------------
