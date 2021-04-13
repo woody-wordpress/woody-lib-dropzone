@@ -36,20 +36,53 @@ class DropZoneManager
         }
     }
 
-    public function set($name = null, $data = null, $expired = 0, $action = null, $params = null)
+    public function set($name = null, $data = null, $expired = null, $args = [])
     {
         global $wpdb;
 
-        if (!empty($name)) {
-            $name = sanitize_title($name);
+        if (!empty($name) && !empty($data)) {
+            // Controle Expired value
+            if (empty($expired) || !is_int($expired)) {
+                $expired = null;
+            }
 
+            if (!is_array($args)) {
+                output_error('DROPZONE SET "' . $name . '" (args must be a array)');
+                exit();
+            }
+
+            $args = array_merge([
+                'action' => '',
+                'params' => [],
+                'cache' => true
+            ], $args);
+
+            // Controle Action value
+            $action = $args['action'];
+            if (!is_string($action)) {
+                output_error('DROPZONE SET "' . $name . '" (action must be a string)');
+                exit();
+            }
+
+            // Controle Params value
+            $params = maybe_serialize($args['params']);
+
+            // Controle Cache value
+            $cache = $args['cache'];
+            if (!is_bool($cache)) {
+                output_error('DROPZONE SET "' . $name . '" (cache must be a boolean)');
+                exit();
+            }
+
+            // Create Query
+            $name = sanitize_title($name);
             $query = [
                 'name' => $name,
                 'data' => maybe_serialize($data),
                 'created' => current_time('mysql'),
                 'expired' => $expired,
                 'action' => $action,
-                'params' => maybe_serialize($params),
+                'params' => $params,
             ];
 
             $results = $wpdb->get_results(sprintf("SELECT id FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);
@@ -71,7 +104,12 @@ class DropZoneManager
                 }
             }
 
-            wp_cache_set('dropzone_' . $name, $data, 'woody', $expired);
+            // Save inside Memcached if set
+            if ($cache) {
+                wp_cache_set('dropzone_' . $name, $data, 'woody', $expired);
+            }
+        } else {
+            output_error('DROPZONE SET (empty name or data)');
         }
     }
 
@@ -98,10 +136,11 @@ class DropZoneManager
 
             if (!empty($result['action'])) {
                 // Params can be pass to function as string or array
-                // dropzone_set('name', 'data', 86400, 'my_action_hook');
-                // dropzone_set('name', 'data', 0, 'my_action_hook');
-                // dropzone_set('name', 'data', 0, 'my_action_hook', 'my_var');
-                // dropzone_set('name', 'data', 0, 'my_action_hook', ['my_var', 'my_var2']);
+                // dropzone_set('name', 'data', 86400, ['action' => 'my_action_hook']);
+                // dropzone_set('name', 'data', null, ['action' => 'my_action_hook']);
+                // dropzone_set('name', 'data', null, ['action' => 'my_action_hook', 'cache' => false]);
+                // dropzone_set('name', 'data', 0, ['action' => 'my_action_hook', 'params' => 'my_var']);
+                // dropzone_set('name', 'data', 0, ['action' => 'my_action_hook', 'params' => ['my_var', 'my_var2']]);
 
                 $func_array = [];
                 if (!empty($result['params'])) {
@@ -176,7 +215,7 @@ class DropZoneManager
     {
         // Return empty if expired and delete item
         if (!empty($result['expired']) && !empty($result['created'])) {
-            $expired = $result['expired'];
+            $expired = (!empty($result['expired'])) ? $result['expired'] : 0;
             $created = \DateTime::createFromFormat('Y-m-d H:i:s', $result['created'], wp_timezone())->getTimestamp();
 
             if (time() > ($created + $expired)) {
