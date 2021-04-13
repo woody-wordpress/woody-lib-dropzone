@@ -11,9 +11,9 @@ function dropzone_get($name = null)
     return apply_filters('woody_dropzone_get', $name);
 }
 
-function dropzone_set($name = null, $data = null, $expired = 0, $action = null, $params = null)
+function dropzone_set($name = null, $data = null, $expired = null, $args = [])
 {
-    do_action('woody_dropzone_set', $name, $data, $expired, $action, $params);
+    do_action('woody_dropzone_set', $name, $data, $expired, $args);
 }
 
 function dropzone_delete($name = null)

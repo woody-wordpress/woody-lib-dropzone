@@ -20,7 +20,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.2.1');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.3.0');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -50,7 +50,7 @@ final class DropZone extends Module
         add_action('init', [$this, 'scheduleDropzoneCleanup']);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
-        add_action('woody_dropzone_set', [$this, 'set'], 10, 5);
+        add_action('woody_dropzone_set', [$this, 'set'], 10, 4);
         add_action('woody_dropzone_delete', [$this, 'delete'], 10, 1);
         add_action('woody_dropzone_warm', [$this, 'warm'], 10, 1);
         add_filter('woody_dropzone_warm_all', [$this, 'warm_all'], 10);
@@ -77,9 +77,9 @@ final class DropZone extends Module
         return $this->dropZoneManager->get($name);
     }
 
-    public function set($name = null, $data = null, $expired = 0, $action = null, $params = null)
+    public function set($name = null, $data = null, $expired = null, $args = [])
     {
-        $this->dropZoneManager->set($name, $data, $expired, $action, $params);
+        $this->dropZoneManager->set($name, $data, $expired, $args);
     }
 
     public function delete($name = null)
