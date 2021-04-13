@@ -15,6 +15,7 @@ class DropZoneManager
         if (!empty($name)) {
             $name = sanitize_title($name);
             $data = wp_cache_get('dropzone_' . $name, 'woody');
+
             if (empty($data)) {
                 $result = $this->getItem($name);
 
@@ -22,13 +23,15 @@ class DropZoneManager
                 if (!empty($result['data'])) {
                     $data = maybe_unserialize($result['data']);
 
-                    if (defined('WP_CLI') && WP_CLI) {
-                        output_success('DROPZONE GET "' . $name . '" (BDD) : ' . $this->isBlob($data));
-                    }
+                    output_success('DROPZONE GET "' . $name . '" (BDD) : ' . $this->isBlob($data));
 
-                    wp_cache_set('dropzone_' . $name, $data, 'woody', $result['expired']);
+                    if ($result['cache']) {
+                        wp_cache_set('dropzone_' . $name, $data, 'woody', $result['expired']);
+                    }
+                } else {
+                    output_error('DROPZONE GET "' . $name . '" (BDD) : not exist');
                 }
-            } elseif (defined('WP_CLI') && WP_CLI) {
+            } else {
                 output_success('DROPZONE GET "' . $name . '" (CACHE) : ' . $this->isBlob($data));
             }
 
@@ -52,14 +55,14 @@ class DropZoneManager
             }
 
             $args = array_merge([
-                'action' => '',
-                'params' => [],
+                'action' => null,
+                'params' => null,
                 'cache' => true
             ], $args);
 
             // Controle Action value
             $action = $args['action'];
-            if (!is_string($action)) {
+            if (!empty($action) && !is_string($action)) {
                 output_error('DROPZONE SET "' . $name . '" (action must be a string)');
                 exit();
             }
@@ -83,6 +86,7 @@ class DropZoneManager
                 'expired' => $expired,
                 'action' => $action,
                 'params' => $params,
+                'cache' => $cache,
             ];
 
             $results = $wpdb->get_results(sprintf("SELECT id FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);

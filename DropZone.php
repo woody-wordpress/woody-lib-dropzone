@@ -20,7 +20,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.3.0');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.3.1');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -155,6 +155,9 @@ final class DropZone extends Module
         if ($saved_version < 100 && $this->upgrade_100()) {
             update_option('woody_dropzone_db_version', 100);
         }
+        if ($saved_version < 200 && $this->upgrade_200()) {
+            update_option('woody_dropzone_db_version', 200);
+        }
     }
 
     private function upgrade_100()
@@ -177,6 +180,16 @@ final class DropZone extends Module
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        return empty($wpdb->last_error);
+    }
+
+    private function upgrade_200()
+    {
+        global $wpdb;
+
+        // Apply upgrade
+        $sql = "ALTER TABLE `{$wpdb->base_prefix}woody_dropzone` ADD `cache` BOOLEAN default 1;";
+        $wpdb->query($sql);
         return empty($wpdb->last_error);
     }
 }
