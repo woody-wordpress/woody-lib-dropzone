@@ -20,7 +20,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameters, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.3.2');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.3.3');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -46,7 +46,6 @@ final class DropZone extends Module
 
         add_action('init', [$this, 'init']);
         add_action('init', [$this, 'upgrade']);
-
         add_action('init', [$this, 'scheduleDropzoneCleanup']);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
@@ -108,9 +107,12 @@ final class DropZone extends Module
     public function init()
     {
         if (is_admin()) {
-            add_action('admin_bar_menu', [$this, 'warm_all_adminbar'], 100);
-            if (isset($_GET['refresh_dropzone']) && check_admin_referer('dropzone')) {
-                $this->refresh_dropzone();
+            $user = wp_get_current_user();
+            if (in_array('administrator', $user->roles)) {
+                add_action('admin_bar_menu', [$this, 'warm_all_adminbar'], 100);
+                if (isset($_GET['refresh_dropzone']) && check_admin_referer('dropzone')) {
+                    $this->refresh_dropzone();
+                }
             }
         }
     }
