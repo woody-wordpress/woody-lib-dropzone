@@ -179,7 +179,7 @@ class DropZoneManager
         $results = $wpdb->get_results("SELECT name, expired, created, action FROM {$wpdb->prefix}woody_dropzone WHERE action is not NULL", ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
-                $result = $this->check_expired($result);
+                $result = $this->checkIfExpired($result);
                 if (!empty($result['name'])) {
                     $this->warm($result['name']);
                     $return[] = $result['name'];
@@ -198,7 +198,7 @@ class DropZoneManager
         $results = $wpdb->get_results("SELECT name, expired, created FROM {$wpdb->prefix}woody_dropzone", ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
-                $this->check_expired($result);
+                $this->checkIfExpired($result);
             }
         }
     }
@@ -211,11 +211,11 @@ class DropZoneManager
             $name = sanitize_title($name);
             $results = $wpdb->get_results(sprintf("SELECT * FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);
             $result = current($results);
-            return $this->check_expired($result);
+            return $this->checkIfExpired($result);
         }
     }
 
-    private function check_expired($result = [])
+    private function checkIfExpired($result = [])
     {
         // Return empty if expired and delete item
         if (!empty($result['expired']) && !empty($result['created'])) {
