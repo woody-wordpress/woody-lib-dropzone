@@ -23,16 +23,16 @@ class DropZoneManager
                 if (!empty($result['data'])) {
                     $data = maybe_unserialize($result['data']);
 
-                    output_success('DROPZONE GET "' . $name . '" (BDD) : ' . $this->isBlob($data));
+                    //output_success('DROPZONE GET "' . $name . '" (BDD) : ' . $this->isBlob($data));
 
                     if ($result['cache']) {
                         wp_cache_set('dropzone_' . $name, $data, 'woody', $result['expired']);
                     }
                 } else {
-                    output_warning('DROPZONE GET "' . $name . '" (BDD) : not exist');
+                    //output_warning('DROPZONE GET "' . $name . '" (BDD) : not exist');
                 }
             } else {
-                output_success('DROPZONE GET "' . $name . '" (CACHE) : ' . $this->isBlob($data));
+                //output_success('DROPZONE GET "' . $name . '" (CACHE) : ' . $this->isBlob($data));
             }
 
             return $data;
