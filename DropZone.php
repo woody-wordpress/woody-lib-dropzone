@@ -121,7 +121,7 @@ final class DropZone extends Module
     {
         $admin_bar->add_menu(array(
             'id'    => 'warm-all-dropzone',
-            'title' => 'Refresh Dropzone',
+            'title' => '<span class="ab-icon dashicons dashicons-update" style="top:2px;" aria-hidden="true"></span> Refresh Dropzone',
             'href'  => wp_nonce_url(add_query_arg('refresh_dropzone', 1), 'dropzone'),
             'meta'  => array(
                 'title' => 'Refresh Dropzone',
