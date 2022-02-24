@@ -17,6 +17,7 @@ final class DropZone extends Module
 {
     protected static $key = 'woody_lib_dropzone';
     protected $refresh_list = [];
+    protected $dropZoneManager;
 
     public function initialize(ParameterManager $parameterManager, Container $container)
     {

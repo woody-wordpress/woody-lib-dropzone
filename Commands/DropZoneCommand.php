@@ -20,6 +20,7 @@ use Woody\App\Container;
 class DropZoneCommand
 {
     private \Woody\App\Container $container;
+    private $dropZoneManager;
 
     public function __construct(Container $container)
     {
