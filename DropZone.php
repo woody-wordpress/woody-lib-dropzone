@@ -18,13 +18,13 @@ final class DropZone extends Module
     protected static $key = 'woody_lib_dropzone';
     protected $refresh_list = [];
 
-    public function initialize(ParameterManager $parameters, Container $container)
+    public function initialize(ParameterManager $parameterManager, Container $container)
     {
         define('WOODY_LIB_DROPZONE_VERSION', '1.3.5');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
-        parent::initialize($parameters, $container);
+        parent::initialize($parameterManager, $container);
         $this->dropZoneManager = $this->container->get('dropzone.manager');
         require_once WOODY_LIB_DROPZONE_DIR_ROOT . '/Helpers/Helpers.php';
     }

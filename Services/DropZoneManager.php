@@ -95,16 +95,16 @@ class DropZoneManager
                 $query['id'] = $result['id'];
                 $wpdb->update("{$wpdb->prefix}woody_dropzone", $query, ['id' => $result['id']]);
 
-                if (defined('WP_CLI') && WP_CLI) {
+                if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    output_success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query));
+                    output_success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
                 }
             } else {
                 $wpdb->insert("{$wpdb->prefix}woody_dropzone", $query);
 
-                if (defined('WP_CLI') && WP_CLI) {
+                if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    output_success('DROPZONE INSERT "' . $name . '" : ' . json_encode($query));
+                    output_success('DROPZONE INSERT "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
                 }
             }
 
@@ -158,7 +158,7 @@ class DropZoneManager
 
                 // Added action on first position
                 array_unshift($func_array, $result['action']);
-                output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array));
+                output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array, JSON_THROW_ON_ERROR));
 
                 // Delete before warm
                 $this->delete($name);
@@ -194,7 +194,6 @@ class DropZoneManager
     {
         global $wpdb;
 
-        $return = [];
         $results = $wpdb->get_results("SELECT name, expired, created FROM {$wpdb->prefix}woody_dropzone", ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
@@ -237,7 +236,7 @@ class DropZoneManager
         if (is_bool($val)) {
             return $val;
         } else {
-            $val = (!is_string($val)) ? json_encode($val) : $val;
+            $val = (!is_string($val)) ? json_encode($val, JSON_THROW_ON_ERROR) : $val;
             if (strlen($val) > 200) {
                 return '--- BLOB (more than 200 characters) ---';
             } else {

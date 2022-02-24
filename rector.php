@@ -12,11 +12,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // get parameters
     $parameters = $containerConfigurator->parameters();
     $parameters->set(Option::PATHS, [__DIR__]);
-    // $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_73);
 
-    // Define what rule sets will be applied
-    $containerConfigurator->import(LevelSetList::UP_TO_PHP_81);
-    // $containerConfigurator->import(SetList::PHP_73);
-    //$containerConfigurator->import(SetList::CODE_QUALITY);
+    $containerConfigurator->import(LevelSetList::UP_TO_PHP_74);
+    // $containerConfigurator->import(LevelSetList::UP_TO_PHP_81);
+    // $containerConfigurator->import(SetList::TYPE_DECLARATION);
     $containerConfigurator->import(SetList::DEAD_CODE);
+    // $containerConfigurator->import(SetList::NAMING);
+    // $containerConfigurator->import(SetList::ORDER);
+    // $containerConfigurator->import(SetList::CODE_QUALITY);
+    // $containerConfigurator->import(SetList::CODING_STYLE);
 };
