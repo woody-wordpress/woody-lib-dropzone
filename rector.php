@@ -18,7 +18,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // $containerConfigurator->import(SetList::TYPE_DECLARATION);
     $containerConfigurator->import(SetList::DEAD_CODE);
     // $containerConfigurator->import(SetList::NAMING);
-    // $containerConfigurator->import(SetList::ORDER);
+    $containerConfigurator->import(SetList::ORDER);
     // $containerConfigurator->import(SetList::CODE_QUALITY);
     // $containerConfigurator->import(SetList::CODING_STYLE);
 };

@@ -214,6 +214,20 @@ class DropZoneManager
         }
     }
 
+    private function isBlob($val)
+    {
+        if (is_bool($val)) {
+            return $val;
+        } else {
+            $val = (!is_string($val)) ? json_encode($val, JSON_THROW_ON_ERROR) : $val;
+            if (strlen($val) > 200) {
+                return '--- BLOB (more than 200 characters) ---';
+            } else {
+                return $val;
+            }
+        }
+    }
+
     private function checkIfExpired($result = [])
     {
         // Return empty if expired and delete item
@@ -229,19 +243,5 @@ class DropZoneManager
         }
 
         return $result;
-    }
-
-    private function isBlob($val)
-    {
-        if (is_bool($val)) {
-            return $val;
-        } else {
-            $val = (!is_string($val)) ? json_encode($val, JSON_THROW_ON_ERROR) : $val;
-            if (strlen($val) > 200) {
-                return '--- BLOB (more than 200 characters) ---';
-            } else {
-                return $val;
-            }
-        }
     }
 }
