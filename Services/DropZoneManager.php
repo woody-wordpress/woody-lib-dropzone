@@ -219,7 +219,7 @@ class DropZoneManager
         if (is_bool($val)) {
             return $val;
         } else {
-            $val = (!is_string($val)) ? json_encode($val, JSON_THROW_ON_ERROR) : $val;
+            $val = (is_string($val)) ? $val : json_encode($val, JSON_THROW_ON_ERROR);
             if (strlen($val) > 200) {
                 return '--- BLOB (more than 200 characters) ---';
             } else {
@@ -232,7 +232,7 @@ class DropZoneManager
     {
         // Return empty if expired and delete item
         if (!empty($result['expired']) && !empty($result['created'])) {
-            $expired = (!empty($result['expired'])) ? $result['expired'] : 0;
+            $expired = (empty($result['expired'])) ? 0 : $result['expired'];
             $created = \DateTime::createFromFormat('Y-m-d H:i:s', $result['created'], wp_timezone())->getTimestamp();
 
             if (time() > ($created + $expired)) {
