@@ -19,10 +19,9 @@ use Woody\App\Container;
 
 class DropZoneCommand
 {
-    /**
-     * @var Container
-     */
-    private $container;
+    private \Woody\App\Container $container;
+
+    private $dropZoneManager;
 
     public function __construct(Container $container)
     {
@@ -32,25 +31,25 @@ class DropZoneCommand
 
     public function get($args, $assoc_args)
     {
-        list($name) = $args;
+        [$name] = $args;
         $this->dropZoneManager->get($name);
     }
 
     public function set($args, $assoc_args)
     {
-        list($name, $data, $expired, $action, $params) = $args;
+        [$name, $data, $expired, $action, $params] = $args;
         $this->dropZoneManager->set($name, $data, $expired, $action, $params);
     }
 
     public function delete($args, $assoc_args)
     {
-        list($name) = $args;
+        [$name] = $args;
         $this->dropZoneManager->delete($name);
     }
 
     public function warm($args, $assoc_args)
     {
-        list($name) = $args;
+        [$name] = $args;
         $this->dropZoneManager->warm($name);
     }
 
