@@ -89,7 +89,7 @@ class DropZoneManager
                 'cache' => $cache,
             ];
 
-            $results = $wpdb->get_results(sprintf(sprintf('SELECT id FROM %swoody_dropzone WHERE name = \'%%s\'', $wpdb->prefix), $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf("SELECT id FROM %swoody_dropzone WHERE name = '%%s'", $wpdb->prefix, $name), ARRAY_A);
             $result = current($results);
             if (!empty($result['id'])) {
                 $query['id'] = $result['id'];
@@ -164,7 +164,8 @@ class DropZoneManager
                 $this->delete($name);
 
                 // Call do_action()
-                call_user_func_array('do_action', $func_array);
+                // call_user_func_array('do_action', $func_array); new syntax
+                do_action(...$func_array);
             } else {
                 output_error('DROPZONE WARM "' . $name . '" : no action to WARM');
             }
@@ -208,7 +209,7 @@ class DropZoneManager
 
         if (!empty($name)) {
             $name = sanitize_title($name);
-            $results = $wpdb->get_results(sprintf(sprintf('SELECT * FROM %swoody_dropzone WHERE name = \'%%s\'', $wpdb->prefix), $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf("SELECT * FROM %swoody_dropzone WHERE name = '%%s'", $wpdb->prefix, $name), ARRAY_A);
             $result = current($results);
             return $this->checkIfExpired($result);
         }
