@@ -46,8 +46,8 @@ final class DropZone extends Module
         register_deactivation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'deactivate']);
 
         add_action('init', [$this, 'init']);
-        add_action('init', [$this, 'upgrade']);
         add_action('init', [$this, 'scheduleDropzoneCleanup']);
+        add_action('woody_theme_update', [$this, 'upgrade'], 2);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
         add_action('woody_dropzone_set', [$this, 'set'], 10, 4);
@@ -183,7 +183,13 @@ final class DropZone extends Module
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
-        return empty($wpdb->last_error);
+        if (empty($wpdb->last_error)) {
+            output_success('+ woody-lib-dropzone upgrade_100');
+            return true;
+        } else {
+            output_error('+ woody-lib-dropzone upgrade_100');
+            return false;
+        }
     }
 
     private function upgrade_200()
@@ -193,6 +199,12 @@ final class DropZone extends Module
         // Apply upgrade
         $sql = "ALTER TABLE `{$wpdb->base_prefix}woody_dropzone` ADD `cache` BOOLEAN default 1;";
         $wpdb->query($sql);
-        return empty($wpdb->last_error);
+        if (empty($wpdb->last_error)) {
+            output_success('+ woody-lib-dropzone upgrade_200');
+            return true;
+        } else {
+            output_error('+ woody-lib-dropzone upgrade_200');
+            return false;
+        }
     }
 }
