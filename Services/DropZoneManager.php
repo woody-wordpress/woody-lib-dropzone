@@ -89,7 +89,7 @@ class DropZoneManager
                 'cache' => $cache,
             ];
 
-            $results = $wpdb->get_results(sprintf("SELECT id FROM %swoody_dropzone WHERE name = '%%s'", $wpdb->prefix, $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf("SELECT id FROM %swoody_dropzone WHERE name = '%s'", $wpdb->prefix, $name), ARRAY_A);
             $result = current($results);
             if (!empty($result['id'])) {
                 $query['id'] = $result['id'];
@@ -209,7 +209,7 @@ class DropZoneManager
 
         if (!empty($name)) {
             $name = sanitize_title($name);
-            $results = $wpdb->get_results(sprintf("SELECT * FROM %swoody_dropzone WHERE name = '%%s'", $wpdb->prefix, $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf("SELECT * FROM %swoody_dropzone WHERE name = '%s'", $wpdb->prefix, $name), ARRAY_A);
             $result = current($results);
             return $this->checkIfExpired($result);
         }
