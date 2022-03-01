@@ -16,15 +16,18 @@ use Woody\Lib\DropZone\Commands\DropZoneCommand;
 final class DropZone extends Module
 {
     protected static $key = 'woody_lib_dropzone';
+
     protected $refresh_list = [];
 
-    public function initialize(ParameterManager $parameters, Container $container)
+    protected $dropZoneManager;
+
+    public function initialize(ParameterManager $parameterManager, Container $container)
     {
         define('WOODY_LIB_DROPZONE_VERSION', '1.3.5');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
-        parent::initialize($parameters, $container);
+        parent::initialize($parameterManager, $container);
         $this->dropZoneManager = $this->container->get('dropzone.manager');
         require_once WOODY_LIB_DROPZONE_DIR_ROOT . '/Helpers/Helpers.php';
     }
@@ -45,8 +48,8 @@ final class DropZone extends Module
         register_deactivation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'deactivate']);
 
         add_action('init', [$this, 'init']);
-        add_action('init', [$this, 'upgrade']);
         add_action('init', [$this, 'scheduleDropzoneCleanup']);
+        add_action('woody_theme_update', [$this, 'upgrade'], 2);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
         add_action('woody_dropzone_set', [$this, 'set'], 10, 4);
@@ -142,6 +145,7 @@ final class DropZone extends Module
             foreach ($this->refresh_list as $item) {
                 echo '<br />&nbsp;•&nbsp;' . $item;
             }
+
             echo '</p></div>';
         } else {
             echo '<div id="message" class="error fade"><p><strong>Dropzone is empty</strong></p></div>';
@@ -157,6 +161,7 @@ final class DropZone extends Module
         if ($saved_version < 100 && $this->upgrade_100()) {
             update_option('woody_dropzone_db_version', 100);
         }
+
         if ($saved_version < 200 && $this->upgrade_200()) {
             update_option('woody_dropzone_db_version', 200);
         }
@@ -178,11 +183,17 @@ final class DropZone extends Module
             `action` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
             `params` longtext CHARACTER SET utf8 DEFAULT NULL,
             PRIMARY KEY (`id`, `name`)
-        ) $charset_collate;";
+        ) {$charset_collate};";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
-        return empty($wpdb->last_error);
+        if (empty($wpdb->last_error)) {
+            output_success('+ woody-lib-dropzone upgrade_100');
+            return true;
+        } else {
+            output_error('+ woody-lib-dropzone upgrade_100');
+            return false;
+        }
     }
 
     private function upgrade_200()
@@ -190,8 +201,14 @@ final class DropZone extends Module
         global $wpdb;
 
         // Apply upgrade
-        $sql = "ALTER TABLE `{$wpdb->base_prefix}woody_dropzone` ADD `cache` BOOLEAN default 1;";
+        $sql = sprintf('ALTER TABLE `%swoody_dropzone` ADD `cache` BOOLEAN default 1;', $wpdb->base_prefix);
         $wpdb->query($sql);
-        return empty($wpdb->last_error);
+        if (empty($wpdb->last_error)) {
+            output_success('+ woody-lib-dropzone upgrade_200');
+            return true;
+        } else {
+            output_error('+ woody-lib-dropzone upgrade_200');
+            return false;
+        }
     }
 }

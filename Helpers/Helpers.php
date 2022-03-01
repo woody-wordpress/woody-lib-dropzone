@@ -28,5 +28,5 @@ function dropzone_warm($name = null)
 
 function dropzone_warm_all()
 {
-    return apply_filters('woody_dropzone_warm_all', $name);
+    return apply_filters('woody_dropzone_warm_all', null);
 }
