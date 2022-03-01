@@ -89,18 +89,18 @@ class DropZoneManager
                 'cache' => $cache,
             ];
 
-            $results = $wpdb->get_results(sprintf("SELECT id FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf(sprintf('SELECT id FROM %swoody_dropzone WHERE name = \'%%s\'', $wpdb->prefix), $name), ARRAY_A);
             $result = current($results);
             if (!empty($result['id'])) {
                 $query['id'] = $result['id'];
-                $wpdb->update("{$wpdb->prefix}woody_dropzone", $query, ['id' => $result['id']]);
+                $wpdb->update(sprintf('%swoody_dropzone', $wpdb->prefix), $query, ['id' => $result['id']]);
 
                 if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
                     output_success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
                 }
             } else {
-                $wpdb->insert("{$wpdb->prefix}woody_dropzone", $query);
+                $wpdb->insert(sprintf('%swoody_dropzone', $wpdb->prefix), $query);
 
                 if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
@@ -123,7 +123,7 @@ class DropZoneManager
 
         if (!empty($name)) {
             $name = sanitize_title($name);
-            $wpdb->delete("{$wpdb->prefix}woody_dropzone", [
+            $wpdb->delete(sprintf('%swoody_dropzone', $wpdb->prefix), [
                 'name' => $name,
             ]);
 
@@ -176,7 +176,7 @@ class DropZoneManager
         global $wpdb;
 
         $return = [];
-        $results = $wpdb->get_results("SELECT name, expired, created, action FROM {$wpdb->prefix}woody_dropzone WHERE action is not NULL", ARRAY_A);
+        $results = $wpdb->get_results(sprintf('SELECT name, expired, created, action FROM %swoody_dropzone WHERE action is not NULL', $wpdb->prefix), ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
                 $result = $this->checkIfExpired($result);
@@ -194,7 +194,7 @@ class DropZoneManager
     {
         global $wpdb;
 
-        $results = $wpdb->get_results("SELECT name, expired, created FROM {$wpdb->prefix}woody_dropzone", ARRAY_A);
+        $results = $wpdb->get_results(sprintf('SELECT name, expired, created FROM %swoody_dropzone', $wpdb->prefix), ARRAY_A);
         if (!empty($results)) {
             foreach ($results as $result) {
                 $this->checkIfExpired($result);
@@ -208,7 +208,7 @@ class DropZoneManager
 
         if (!empty($name)) {
             $name = sanitize_title($name);
-            $results = $wpdb->get_results(sprintf("SELECT * FROM {$wpdb->prefix}woody_dropzone WHERE name = '%s'", $name), ARRAY_A);
+            $results = $wpdb->get_results(sprintf(sprintf('SELECT * FROM %swoody_dropzone WHERE name = \'%%s\'', $wpdb->prefix), $name), ARRAY_A);
             $result = current($results);
             return $this->checkIfExpired($result);
         }

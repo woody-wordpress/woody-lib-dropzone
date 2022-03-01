@@ -16,7 +16,9 @@ use Woody\Lib\DropZone\Commands\DropZoneCommand;
 final class DropZone extends Module
 {
     protected static $key = 'woody_lib_dropzone';
+
     protected $refresh_list = [];
+
     protected $dropZoneManager;
 
     public function initialize(ParameterManager $parameterManager, Container $container)
@@ -143,6 +145,7 @@ final class DropZone extends Module
             foreach ($this->refresh_list as $item) {
                 echo '<br />&nbsp;•&nbsp;' . $item;
             }
+
             echo '</p></div>';
         } else {
             echo '<div id="message" class="error fade"><p><strong>Dropzone is empty</strong></p></div>';
@@ -158,6 +161,7 @@ final class DropZone extends Module
         if ($saved_version < 100 && $this->upgrade_100()) {
             update_option('woody_dropzone_db_version', 100);
         }
+
         if ($saved_version < 200 && $this->upgrade_200()) {
             update_option('woody_dropzone_db_version', 200);
         }
@@ -179,7 +183,7 @@ final class DropZone extends Module
             `action` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
             `params` longtext CHARACTER SET utf8 DEFAULT NULL,
             PRIMARY KEY (`id`, `name`)
-        ) $charset_collate;";
+        ) {$charset_collate};";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -197,7 +201,7 @@ final class DropZone extends Module
         global $wpdb;
 
         // Apply upgrade
-        $sql = "ALTER TABLE `{$wpdb->base_prefix}woody_dropzone` ADD `cache` BOOLEAN default 1;";
+        $sql = sprintf('ALTER TABLE `%swoody_dropzone` ADD `cache` BOOLEAN default 1;', $wpdb->base_prefix);
         $wpdb->query($sql);
         if (empty($wpdb->last_error)) {
             output_success('+ woody-lib-dropzone upgrade_200');
