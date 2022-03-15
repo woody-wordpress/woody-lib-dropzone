@@ -23,7 +23,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameterManager, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.5.0');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.5.1');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -48,7 +48,7 @@ final class DropZone extends Module
         register_deactivation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'deactivate']);
 
         add_action('init', [$this, 'init']);
-        add_action('init', [$this, 'scheduleDropzoneCleanup']);
+        add_action('woody_theme_update', [$this, 'scheduleDropzoneCleanup']);
         add_action('woody_theme_update', [$this, 'upgrade'], 2);
 
         add_filter('woody_dropzone_get', [$this, 'get'], 10, 1);
@@ -67,6 +67,7 @@ final class DropZone extends Module
     {
         if (!wp_next_scheduled('woody_dropzone_cleanup')) {
             wp_schedule_event(time(), 'daily', 'woody_dropzone_cleanup');
+            output_success(sprintf('+ Schedule %s', 'woody_dropzone_cleanup'));
         }
     }
 
