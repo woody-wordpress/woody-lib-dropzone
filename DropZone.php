@@ -17,7 +17,7 @@ final class DropZone extends Module
 {
     protected static $key = 'woody_lib_dropzone';
 
-    protected $refresh_list = [];
+    protected array $refresh_list = [];
 
     protected $dropZoneManager;
 
