@@ -32,7 +32,7 @@ class DropZoneCommand
     public function get($args, $assoc_args)
     {
         [$name] = $args;
-        $this->dropZoneManager->get($name);
+        output_log($this->dropZoneManager->get($name));
     }
 
     public function set($args, $assoc_args)
