@@ -23,7 +23,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameterManager, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.6.1');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.7.0');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -77,16 +77,21 @@ final class DropZone extends Module
 
     public function get($name = null)
     {
-        return $this->dropZoneManager->get($name);
+        if (!isset($GLOBALS['dropzone_' . $name])) {
+            $GLOBALS['dropzone_' . $name] = $this->dropZoneManager->get($name);
+        }
+        return $GLOBALS['dropzone_' . $name];
     }
 
     public function set($name = null, $data = null, $expired = null, $args = [])
     {
+        $GLOBALS['dropzone_' . $name] = $data;
         $this->dropZoneManager->set($name, $data, $expired, $args);
     }
 
     public function delete($name = null)
     {
+        unset($GLOBALS['dropzone_' . $name]);
         $this->dropZoneManager->delete($name);
     }
 
