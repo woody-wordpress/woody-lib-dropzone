@@ -23,7 +23,7 @@ final class DropZone extends Module
 
     public function initialize(ParameterManager $parameterManager, Container $container)
     {
-        define('WOODY_LIB_DROPZONE_VERSION', '1.7.0');
+        define('WOODY_LIB_DROPZONE_VERSION', '1.7.1');
         define('WOODY_LIB_DROPZONE_ROOT', __FILE__);
         define('WOODY_LIB_DROPZONE_DIR_ROOT', dirname(WOODY_LIB_DROPZONE_ROOT));
 
@@ -48,6 +48,9 @@ final class DropZone extends Module
         register_deactivation_hook(WOODY_LIB_DROPZONE_ROOT, [$this, 'deactivate']);
 
         add_action('init', [$this, 'init']);
+        if (defined('DOING_CRON') && DOING_CRON) {
+            add_action('init', [$this, 'scheduleDropzoneCleanup']);
+        }
         add_action('woody_theme_update', [$this, 'scheduleDropzoneCleanup']);
         add_action('woody_theme_update', [$this, 'upgrade'], 2);
 
