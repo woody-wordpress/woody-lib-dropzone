@@ -107,14 +107,16 @@ class DropZoneManager
 
                 if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    output_success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
+                    //output_success('DROPZONE UPDATE "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
+                    output_success(sprintf('DROPZONE UPDATE "%s"', $name));
                 }
             } else {
                 $wpdb->insert(sprintf('%swoody_dropzone', $wpdb->prefix), $query);
 
                 if (defined(\WP_CLI::class) && WP_CLI) {
                     $query['data'] = $this->isBlob($query['data']);
-                    output_success('DROPZONE INSERT "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
+                    //output_success('DROPZONE INSERT "' . $name . '" : ' . json_encode($query, JSON_THROW_ON_ERROR));
+                    output_success(sprintf('DROPZONE INSERT "%s"', $name));
                 }
             }
 
@@ -135,7 +137,7 @@ class DropZoneManager
                 'name' => $name,
             ]);
 
-            output_success('DROPZONE DELETE "' . $name . '"');
+            output_success(sprintf('DROPZONE DELETE "%s"', $name));
             wp_cache_delete('dropzone_' . $name, 'woody');
         }
     }
@@ -166,7 +168,8 @@ class DropZoneManager
 
                 // Added action on first position
                 array_unshift($func_array, $result['action']);
-                output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array, JSON_THROW_ON_ERROR));
+                //output_success('DROPZONE WARM "' . $name . '" : ' . json_encode($func_array, JSON_THROW_ON_ERROR));
+                output_success(sprintf('DROPZONE WARM "%s"', $name));
 
                 // Delete before warm
                 $this->delete($name);
