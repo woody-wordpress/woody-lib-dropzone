@@ -43,6 +43,16 @@ class DropZoneManager
     {
         global $wpdb;
 
+        if(empty($name)) {
+            output_error('DROPZONE SET (empty name)');
+            exit();
+        }
+
+        if(empty($data)) {
+            output_error('DROPZONE SET "' . $name . '" (empty data)');
+            exit();
+        }
+
         if (!empty($name) && !empty($data)) {
             // Controle Expired value
             if (empty($expired) || !is_int($expired)) {
@@ -112,8 +122,6 @@ class DropZoneManager
             if ($cache) {
                 wp_cache_set('dropzone_' . $name, $data, 'woody', $expired);
             }
-        } else {
-            output_error('DROPZONE SET (empty name or data)');
         }
     }
 
